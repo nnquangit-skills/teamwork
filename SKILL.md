@@ -1,6 +1,6 @@
 ---
 name: teamwork
-description: Coordinate agents and subagents through a project's runner. Use for assigning work, selecting models, monitoring runs, resolving blockers, and verifying deliverables before marking them complete.
+description: Coordinate agents and subagents through a project's runner. Use for assigning work, discovering and classifying available models, selecting a model for each assignment, monitoring runs, resolving blockers, and verifying deliverables before marking them complete.
 ---
 
 # Teamwork
@@ -11,11 +11,26 @@ description: Coordinate agents and subagents through a project's runner. Use for
 2. Keep existing IDs. For a four-level plan, group work by Epic → Feature → Task → Subtask. Schedule items whose dependencies have cleared, taking P0 before P1 and P2. Give each Task one owner who integrates its results. That owner may do all Subtasks or delegate those with a clear output and an independently verifiable boundary.
 3. Give each run its ID, parent ID, assignee, dependencies, writable files, deliverable, acceptance criteria, verification commands, and handoff location. Assign ownership of shared interfaces before starting parallel implementation. Give concurrent writers separate Git worktrees through the project's runner. Confirm that the previous writer has stopped before reassigning the same work.
 
-## Start a run and select a model
+## Discover and classify models before dispatch
 
-- Inspect the project's ACP runner, adapter, preset, and available models. If the runner uses `npx`, take the package name, version, and invocation from the project's configuration or runner documentation. Verify that the adapter responds before dispatching a batch. Record the session ID and actual model.
-- Use a lightweight model for inventory or bounded documentation edits. Match cross-component design, regression diagnosis, and high-risk review to a model with the relevant capabilities.
-- When credits run out, preserve the checkpoint, diff, verification results, and remaining work. Confirm that the old run has stopped writing. Resume the **same work item ID** in a new run on the configured fallback provider, such as `litellm-237`. Diagnose rate limits, authentication failures, and test failures separately. Load credentials from the project's private environment.
+At the start of each execution batch, the coordinator must scan the available models across the agents being considered, including configured fallback providers. Reuse the inventory across assignments in that batch. Refresh the affected entries when access, configuration, quota, or the work requirements change.
+
+1. **Discover candidates.** Inspect each agent's ACP adapter and presets. Use the runner's documented model-list command or the configured provider's model catalog under the credentials available to that agent. If the runner uses `npx`, take the package, version, and invocation from the project's configuration. For adapters without enumeration, inspect their configured presets and record the limits of the scan.
+2. **Search for missing information.** When a capability is unclear or the initial list has no suitable candidate, search the provider's current official catalog, model cards, and adapter documentation for alternatives. Cross-check candidates against the models selectable through that agent. Record catalog-only candidates as unverified. Keep credentials and private endpoints out of search queries and reports.
+3. **Classify each candidate by work it can perform.** Record agent, provider, model ID or preset, access status, suitable task types, and the evidence behind the classification. Use the criteria below. A model may fit several classes. Record unknowns explicitly, including context capacity, tool support, or pricing when they affect the decision.
+
+| Work class | What to look for |
+|---|---|
+| Inventory and bounded edits | Accurate extraction or editing on representative inputs, sufficient context, low cost or latency for repeated work. |
+| Implementation and testing | Reliable code edits, tool support through the actual adapter, and the ability to run and interpret the Task's checks. |
+| Architecture and difficult debugging | Reasoning across components, enough context for the affected interfaces, and evidence from comparable design or diagnosis work. |
+| Independent review | Ability to trace requirements, inspect the diff, reproduce failures, and verify acceptance criteria in the review environment. |
+
+## Select a model for each assignment
+
+- For each dispatched Task, separately delegated Subtask, and review, match the acceptance criteria to the inventory. Filter by required inputs, tools, context, and project constraints. Among candidates that meet those requirements, use relevant prior results, cost, and latency to choose. Record the work ID, chosen agent/provider/model, reason, and suitable fallback if available.
+- Confirm that the selected route responds through the intended adapter. An existing successful session or the first bounded step of the assignment can serve as the check. Record the session ID and actual model reported by the runner. If the runner hides the underlying model, record the observed preset and label the model unknown. If no accessible candidate meets a required capability, report that gap and continue independent work.
+- When credits run out, preserve the checkpoint, diff, verification results, and remaining work. Confirm the old run has stopped writing. Refresh availability on the configured fallback provider, such as `litellm-237`, and apply the same selection criteria. Resume the **same work item ID** in a new run and report the change. Diagnose rate limits, authentication failures, and test failures separately.
 
 ## Monitor progress
 

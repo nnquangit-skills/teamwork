@@ -1,6 +1,6 @@
 # Teamwork
 
-Use Teamwork to coordinate several agents on one project. Each Task has one owner responsible for integration. The coordinator selects models, dispatches work through the project's runner, monitors each run, and reports results as soon as they pass review.
+Use Teamwork to coordinate several agents on one project. Each Task has one owner responsible for integration. Before each execution batch, the coordinator scans the models available to each agent, checks provider documentation for capability gaps, and classifies candidates by the work they can perform. Each assignment records the selected model, the reason for the choice, and a fallback when available. The coordinator then dispatches work through the project's runner, monitors each run, and reports results as soon as they pass review.
 
 ## Install
 
