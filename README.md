@@ -29,6 +29,10 @@ Once you approve the plan:
 
 To run agents through ACP, configure a runner, adapter, and access to the selected models. If the project uses a fallback provider, configure credentials in the runtime environment and give the coordinator its preset name. You can use the planning workflow on its own.
 
+## When an agent runs out of quota
+
+The coordinator checkpoints the active run and assigns the remaining work to another available agent under the same work item ID. It checks public benchmarks for the type of work still needed, tries equivalent agents first, and then tries the closest lower-ranked agent that meets the requirements. The handoff report includes the comparison, the preserved changes, and the replacement's next verification step.
+
 ## Use with Worktree
 
 Teamwork manages agent runs. The companion `worktree` skill records progress and evidence by ID in a Markdown tree. Teams with an existing tracker can use Teamwork with that tracker.
