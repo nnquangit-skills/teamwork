@@ -25,7 +25,7 @@ Open an agent at the root of the project. To request a plan:
 
 Once you approve the plan:
 
-> Use teamwork to deliver T1. Dispatch independent Subtasks through the repository's ACP preset. Review submissions as they arrive, notify me when each ID passes, and monitor the work through the integrated checkout test.
+> Use teamwork to deliver T1. When two Subtasks are ready and independent, launch two agents concurrently through the repository's ACP preset. Give each agent its own branch, Git worktree, and writable paths. Review submissions as they arrive, notify me when each ID passes, and monitor the work through the integrated checkout test.
 
 To run agents through ACP, configure a runner, adapter, and access to the selected models. If the project uses a fallback provider, configure credentials in the runtime environment and give the coordinator its preset name. You can use the planning workflow on its own.
 

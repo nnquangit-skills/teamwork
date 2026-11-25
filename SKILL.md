@@ -8,8 +8,15 @@ description: Coordinate agents and subagents through a project's runner. Use for
 ## Plan and assign work
 
 1. Establish whether the project owner wants a plan, a simulation, or execution. Start agents once the owner has requested execution. Read the repository instructions, approved requirements, Feature PRD and ARD, current tracker, and Git status. If sources conflict, identify the approved decision and the affected IDs.
-2. Keep existing IDs. For a four-level plan, group work by Epic → Feature → Task → Subtask. Schedule items whose dependencies have cleared, taking P0 before P1 and P2. Give each Task one owner who integrates its results. That owner may do all Subtasks or delegate those with a clear output and an independently verifiable boundary.
-3. Give each run its ID, parent ID, assignee, dependencies, writable files, deliverable, acceptance criteria, verification commands, and handoff location. Assign ownership of shared interfaces before starting parallel implementation. Give concurrent writers separate Git worktrees through the project's runner. Confirm that the previous writer has stopped before reassigning the same work.
+2. Keep existing IDs. For a four-level plan, group work by Epic → Feature → Task → Subtask. Schedule items whose dependencies have cleared, taking P0 before P1 and P2. Give each Task one owner who integrates its results. That owner keeps dependent work in sequence and coordinates independent Subtasks using the parallel dispatch rule below.
+3. Give each run its ID, parent ID, assignee, dependencies, writable files, deliverable, acceptance criteria, verification commands, and handoff location. Confirm that the previous writer has stopped before reassigning the same work.
+
+## Dispatch independent work to two ACP agents
+
+1. **Choose a ready pair.** When two Tasks or Subtasks can proceed independently, dispatch them concurrently to two distinct ACP agents. If one Task naturally splits into two independently testable deliverables, give each a Subtask ID and keep one owner for integration. Check that neither item needs the other's unfinished output and that the two write scopes do not overlap. Settle shared contracts first. Give shared files such as lockfiles, migrations, and generated manifests a single writer. If that leaves only one ready item, run it immediately and recheck the queue when dependencies clear.
+2. **Start both runs.** Select a suitable model for each assignment. Use the project's configured ACP runner to start two separate sessions from the same recorded base revision, each on its own branch and Git worktree. Give each worker its ID, allowed paths, agreed interface, and checks. Launch the second session while the first is running. Record both session IDs, branches, and worktree paths so either run can be monitored or resumed.
+3. **Handle newly discovered overlap.** If a worker needs a file owned by its peer or needs to change their shared contract, pause that part and notify the coordinator before editing. The coordinator assigns one writer, updates both briefs, and keeps unaffected work moving.
+4. **Integrate and verify.** Review each diff against its assigned paths and criteria. The designated integrator applies one reviewed change at a time, resolves any conflicts with the relevant owners, and runs the checks that exercise both changes together. Report each item as it passes review and close the parent only after the integrated result passes.
 
 ## Discover and classify models before dispatch
 
